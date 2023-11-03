@@ -1,0 +1,118 @@
+﻿@page "/scale"
+@inject NavigationManager Navigation
+
+<h3>更年期 Greene 量表</h3>
+<p>請您根據最近一週的狀況在空格打勾</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>症狀</th>
+            <th>完全沒有</th>
+            <th>輕度</th>
+            <th>中度</th>
+            <th>重度</th>
+            <th>分數</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var symptom in symptoms)   
+        {
+            <tr>
+                <td>@symptom.Name</td>
+                @foreach (var score in symptom.Scores)
+                {
+                    <td><input type="radio" name="@symptom.Name" @onclick="() => UpdateScore(symptom, score)"></td>
+                }
+                <td>@symptom.Score</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<p>總分: @CalculateTotalScore()</p>
+
+<p>Anxiety (A) Scale (1-6) : @CalculateGroupTotalScore(1, 6)</p>
+<p>Depression (D) Scale (7-11) : @CalculateGroupTotalScore(7, 11)</p>
+<p>Psychological (P) Scale (1-11) : @CalculateGroupTotalScore(1, 11)</p>
+<p>Somatic (S) Scale (12-18) : @CalculateGroupTotalScore(12, 18)</p>
+<p>Vasomotor (V) Scale (19-20) : @CalculateGroupTotalScore(19, 20)</p>
+<p>Sexual Dysfunction (S) Scale (21) : @CalculateGroupTotalScore(21, 21)</p>
+
+<button @onclick="NextStep">下一步</button>
+
+@code {
+    class Symptom
+    {
+        public string Name { get; set; }
+        public int Score { get; set; }
+        public List<int> Scores { get; set; }
+
+        public Symptom(string name)
+        {
+            Name = name;
+            Score = 0;
+            Scores = new List<int> { 0, 1, 2, 3 };
+        }
+    }
+
+    List<Symptom> symptoms = new List<Symptom>
+{
+    new Symptom("01、心跳變快或變明顯(怦怦跳)"),
+    new Symptom("02、覺得緊繃或緊張(神經質)"),
+    new Symptom("03、睡眠障礙"),
+    new Symptom("04、靜不下心、急躁"),
+    new Symptom("05、一陣恐慌、不安"),
+    new Symptom("06、注意力難以集中"),
+    new Symptom("07、覺得疲倦或缺乏元氣"),
+    new Symptom("08、對大多數事物失去興趣"),
+    new Symptom("09、覺得不快樂或憂鬱"),
+    new Symptom("10、容易掉淚或哭泣"),
+    new Symptom("11、易怒、容易生氣"),
+    new Symptom("12、覺得頭暈或是有快昏倒的感覺"),
+    new Symptom("13、頭部或身體覺得緊繃或有壓力"),
+    new Symptom("14、身體有些地方感覺麻麻的或有刺痛感"),
+    new Symptom("15、頭痛"),
+    new Symptom("16、肌肉關節痠痛"),
+    new Symptom("17、手或腳感覺變得遲鈍或較沒感覺"),
+    new Symptom("18、呼吸困難"),
+    new Symptom("19、熱潮紅(一陣熱一陣冷、臉紅或冒汗)"),
+    new Symptom("20、夜間流汗"),
+    new Symptom("21、對性失去興趣"),
+};
+  
+    void UpdateScore(Symptom symptom, int score)
+    {
+        symptom.Score = score;
+        StateHasChanged();
+    }
+
+
+    int CalculateTotalScore()
+    {
+        int totalScore = 0;
+        foreach (var symptom in symptoms)
+        {
+            totalScore += symptom.Score;
+        }
+        return totalScore;
+    }
+
+
+
+    int CalculateGroupTotalScore(int start, int end)
+    {
+        int totalScore = 0;
+        for (int i = start - 1; i <= end - 1; i++)
+        {
+            totalScore += symptoms[i].Score;
+        }
+        return totalScore;
+    }
+
+    private void NextStep()
+    {
+        // 導航至頁面
+        Navigation.NavigateTo("/reservation");
+    }
+}

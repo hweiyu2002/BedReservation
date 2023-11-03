@@ -1,0 +1,39 @@
+﻿@inject NavigationManager Navigation
+
+<h3>化療病床預約平台</h3>
+<p>Step 1: 登入資料</p>
+<br />
+
+<div class="form-group">
+    <label>身分證字號</label>
+    <input @bind="IdNumber" />
+</div>
+<br />
+
+<div class="form-group">
+    <label>姓名</label>
+    <input @bind="FullName" />
+</div>
+<br />
+
+<div class="form-group">
+    <label>聯絡電話</label>
+    <input @bind="ContactNumber" />
+</div>
+<br />
+
+<button @onclick="NextStep">下一步</button>
+
+
+@code {
+    private string IdNumber { get; set; }
+    private string FullName { get; set; }
+    private string ContactNumber { get; set; }
+
+    private void NextStep()
+    {
+        // 導航至 Scale 頁面
+        Navigation.NavigateTo("/scale");
+    }
+
+}
