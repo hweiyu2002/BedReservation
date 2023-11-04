@@ -1,6 +1,84 @@
 ﻿@page "/reservation"
-<h3>Reservation</h3>
+@inject IJSRuntime JSRuntime
+
+<h3>化療病床預約平台</h3>
+<h4>Step 3：預約病床</h4>
+<br />
+
+<div class="form-group">
+    <label>選擇日期：</label>
+    <input type="date" @bind="SelectedDate" min="2023-11-01" />
+</div>
+<br />
+
+<div class="form-group">
+    <label>選擇時段：</label><br />
+    @for (int i = 9; i < 18; i++)
+    {
+        @if (i != 17) // 排除17:30選項
+        {
+            <label>
+                <input type="checkbox" checked="@SelectedTimeSlots[i - 9]" @onchange="() => ToggleTimeSlot(i - 9)" />
+                @($"{i.ToString().PadLeft(2, '0')}:00")
+            </label>
+            <label>
+                <input type="checkbox" checked="@SelectedTimeSlots[i - 8]" @onchange="() => ToggleTimeSlot(i - 8)" />
+                @($"{i.ToString().PadLeft(2, '0')}:30")
+            </label>
+            <br />
+        }
+    }
+</div>
+<br />
+
+<div class="form-group">
+    <label>選擇病床：</label>
+    <select @bind="SelectedBed">
+        <option value="A">病床 A</option>
+        <option value="B">病床 B</option>
+        <option value="C">病床 C</option>
+    </select>
+</div><br />
+
+<button @onclick="ShowConfirmationPopup">確認預約</button>
 
 @code {
+    private DateTime SelectedDate { get; set; }
+    private bool[] SelectedTimeSlots = new bool[16];
+    private string SelectedBed { get; set; }
 
+    private void ToggleTimeSlot(int index)
+    {
+        if (index >= 0 && index < SelectedTimeSlots.Length)
+        {
+            SelectedTimeSlots[index] = !SelectedTimeSlots[index];
+        }
+    }
+
+    private async Task ShowConfirmationPopup()
+    {
+        DateTime now = DateTime.Now;
+        string formattedDate = SelectedDate.ToString("yyyy-MM-dd");
+        string reservedTimeSlots = string.Join(", ", GetSelectedTimeSlots());
+        string message = $"預約成功！\n已於 {now} 預約 {formattedDate} 的 {reservedTimeSlots} 病床";
+
+        await JSRuntime.InvokeVoidAsync("showCustomPopup", message);
+    }
+
+    private List<string> GetSelectedTimeSlots()
+    {
+        var selectedSlots = new List<string>();
+
+        for (int i = 0; i < SelectedTimeSlots.Length; i++)
+        {
+            if (SelectedTimeSlots[i])
+            {
+                int hour = 9 + i / 2;
+                int minute = (i % 2) * 30;
+                selectedSlots.Add($"{hour.ToString().PadLeft(2, '0')}:{minute.ToString().PadLeft(2, '0')}");
+            }
+        }
+
+        return selectedSlots;
+    }
 }
