@@ -13,21 +13,23 @@
 
 <div class="form-group">
     <label>選擇時段：</label><br />
-    @for (int i = 9; i < 18; i++)
-    {
-        @if (i != 17) // 排除17:30選項
+    <div style="display: flex; flex-wrap: wrap;">
+        @for (int i = 0; i < 16; i++)
         {
-            <label>
-                <input type="checkbox" checked="@SelectedTimeSlots[i - 9]" @onchange="() => ToggleTimeSlot(i - 9)" />
-                @($"{i.ToString().PadLeft(2, '0')}:00")
-            </label>
-            <label>
-                <input type="checkbox" checked="@SelectedTimeSlots[i - 8]" @onchange="() => ToggleTimeSlot(i - 8)" />
-                @($"{i.ToString().PadLeft(2, '0')}:30")
-            </label>
-            <br />
+            int hour = 9 + i / 2;
+            int minute = (i % 2) * 30;
+
+            string startTime = $"{hour.ToString().PadLeft(2, '0')}:{minute.ToString().PadLeft(2, '0')}";
+            string endTime = $"{(hour + (minute + 30) / 60).ToString().PadLeft(2, '0')}:{((minute + 30) % 60).ToString().PadLeft(2, '0')}";
+
+            <div style="margin-right: 20px;">
+                <label>
+                    <input type="checkbox" checked="@SelectedTimeSlots[i]" @onchange="() => ToggleTimeSlot(i)" />
+                    @($"{startTime} - {endTime}")
+                </label>
+            </div>
         }
-    }
+    </div>
 </div>
 <br />
 
@@ -38,7 +40,8 @@
         <option value="B">病床 B</option>
         <option value="C">病床 C</option>
     </select>
-</div><br />
+</div>
+<br />
 
 <button @onclick="ShowConfirmationPopup">確認預約</button>
 
@@ -59,26 +62,59 @@
     {
         DateTime now = DateTime.Now;
         string formattedDate = SelectedDate.ToString("yyyy-MM-dd");
-        string reservedTimeSlots = string.Join(", ", GetSelectedTimeSlots());
-        string message = $"預約成功！\n已於 {now} 預約 {formattedDate} 的 {reservedTimeSlots} 病床";
+        string selectedTimeSlots = GetSelectedTimeSlots();
+        string selectedBed = SelectedBed;
 
-        await JSRuntime.InvokeVoidAsync("showCustomPopup", message);
+        string message = $"預約成功！\n已於 {now} 預約\n {formattedDate} 時段：{selectedTimeSlots}\n病床：{selectedBed}";
+
+        await JSRuntime.InvokeVoidAsync("alert", message);
     }
 
-    private List<string> GetSelectedTimeSlots()
+    private string GetSelectedTimeSlots()
     {
         var selectedSlots = new List<string>();
+        bool inSlot = false;
+        int startHour = 0;
+        int startMinute = 0;
 
         for (int i = 0; i < SelectedTimeSlots.Length; i++)
         {
             if (SelectedTimeSlots[i])
             {
-                int hour = 9 + i / 2;
-                int minute = (i % 2) * 30;
-                selectedSlots.Add($"{hour.ToString().PadLeft(2, '0')}:{minute.ToString().PadLeft(2, '0')}");
+                if (!inSlot)
+                {
+                    startHour = 9 + i / 2;
+                    startMinute = (i % 2) * 30;
+                    inSlot = true;
+                }
+            }
+            else
+            {
+                if (inSlot)
+                {
+                    int endHour = startHour + ((startMinute + 30) / 60);
+                    int endMinute = (startMinute + 30) % 60;
+
+                    string startTime = $"{startHour.ToString().PadLeft(2, '0')}:{startMinute.ToString().PadLeft(2, '0')}";
+                    string endTime = $"{endHour.ToString().PadLeft(2, '0')}:{endMinute.ToString().PadLeft(2, '0')}";
+
+                    selectedSlots.Add($"{startTime} - {endTime}");
+                    inSlot = false;
+                }
             }
         }
 
-        return selectedSlots;
+        if (inSlot)
+        {
+            int endHour = startHour + ((startMinute + 30) / 60);
+            int endMinute = (startMinute + 30) % 60;
+
+            string startTime = $"{startHour.ToString().PadLeft(2, '0')}:{startMinute.ToString().PadLeft(2, '0')}";
+            string endTime = $"{endHour.ToString().PadLeft(2, '0')}:{endMinute.ToString().PadLeft(2, '0')}";
+
+            selectedSlots.Add($"{startTime} - {endTime}");
+        }
+
+        return string.Join(", ", selectedSlots);
     }
 }
