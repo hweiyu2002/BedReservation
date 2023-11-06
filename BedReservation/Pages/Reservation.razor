@@ -50,21 +50,17 @@
 </div>
 <br />
 
-<div style="text-align: center; ">
+<div style="text-align: center;">
     <button @onclick="ShowConfirmationPopup" style="background-color: #4169e1; color: white; border: 1px solid black;">確認預約</button>
 </div>
 
 <br /><br />
 
-<div id="selectedTimeSlots"></div> <!-- 用來顯示所選時間段的區塊 -->
-
-
-
 
 @code {
     private DateTime SelectedDate { get; set; }
     private bool[] SelectedTimeSlots = new bool[16];
-    private string SelectedBed { get; set; } = "A"; // 添加一個初始值，例如 "A"
+    private string SelectedBed { get; set; } = "A"; // 添加一個初始值， "A"
 
     private void ToggleTimeSlot(int index)
     {
@@ -76,35 +72,8 @@
 
     private async Task ShowConfirmationPopup()
     {
-        DateTime now = DateTime.Now;
-        string formattedDate = SelectedDate.ToString("yyyy-MM-dd");
-        string selectedTimeSlots = GetSelectedTimeSlots();
-        string selectedBed = SelectedBed;
+        // 顯示預約成功訊息
+        await JSRuntime.InvokeVoidAsync("alert", "預約成功！");
 
-        // 在前端顯示所選的時間段
-        await JSRuntime.InvokeVoidAsync("showSelectedTimeSlots", selectedTimeSlots);
-
-        string message = $"預約成功！\n已於 {now} 預約\n {formattedDate} 時段：{selectedTimeSlots}\n病床：{selectedBed}";
-
-        await JSRuntime.InvokeVoidAsync("alert", message);
-    }
-
-    private string GetSelectedTimeSlots()
-    {
-        var selectedSlots = new List<string>();
-
-        for (int i = 0; i < SelectedTimeSlots.Length; i++)
-        {
-            if (SelectedTimeSlots[i])
-            {
-                int hour = 9 + i / 2;
-                string minute = (i % 2 == 0) ? "00" : "30";
-                string nextHour = ((hour + 1) < 10) ? "0" + (hour + 1) : (hour + 1).ToString();
-
-                selectedSlots.Add($"{hour:00}:{minute} ~ {nextHour}:00");
-            }
-        }
-
-        return string.Join(", ", selectedSlots);
     }
 }
