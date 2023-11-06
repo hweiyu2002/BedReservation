@@ -1,5 +1,7 @@
 ﻿@page "/scale"
 @inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
 
 <h3>化療病床預約平台</h3>
 <h4>Step 2：填寫量表</h4>
@@ -111,9 +113,28 @@
         return totalScore;
     }
 
-    private void NextStep()
+    
+
+    private async Task NextStep()
     {
-        // 導航至頁面
-        Navigation.NavigateTo("/reservation");
+        int totalScore = CalculateTotalScore();
+
+        if (totalScore > 60)
+        {
+            // 顯示彈跳視窗
+            bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "由於分數高於60，不適合進行化療，故無法預約。確認返回首頁？");
+
+            if (confirmed)
+            {
+                Navigation.NavigateTo("/userLogin");
+            }
+        }
+        else
+        {
+            // 導航至頁面
+            Navigation.NavigateTo("/reservation");
+        }
     }
+
+
 }
