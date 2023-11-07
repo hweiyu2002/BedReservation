@@ -30,9 +30,10 @@
 </div>
 
 @code {
-    private string IdNumber { get; set; }
-    private string FullName { get; set; }
-    private string ContactNumber { get; set; }
+    private string IdNumber { get; set; } = string.Empty;
+    private string FullName { get; set; } = string.Empty;
+    private string ContactNumber { get; set; } = string.Empty;
+
 
     private void NextStep()
     {
