@@ -1,7 +1,10 @@
 ﻿@page "/scale"
 @inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
 
-<h3>更年期 Greene 量表</h3>
+
+<h3 style="color: #000000; background-color: 	#b0c4de; padding: 10px; text-align: center;">化療病床預約平台</h3>
+<h4 style=" text-align: center ;">Step 2：填寫量表</h4>
 <p>請您根據最近一週的狀況在空格打勾</p>
 
 <table class="table">
@@ -39,7 +42,10 @@
 <p>Vasomotor (V) Scale (19-20) : @CalculateGroupTotalScore(19, 20)</p>
 <p>Sexual Dysfunction (S) Scale (21) : @CalculateGroupTotalScore(21, 21)</p>
 
-<button @onclick="NextStep">下一步</button>
+<div style="display: flex; justify-content: center; ">
+    <button @onclick="NextStep" style="background-color: #4169e1; color: white; border: 1px solid black;">下一步</button>
+</div>
+<br /><br />
 
 @code {
     class Symptom
@@ -110,9 +116,28 @@
         return totalScore;
     }
 
-    private void NextStep()
+    
+
+    private async Task NextStep()
     {
-        // 導航至頁面
-        Navigation.NavigateTo("/reservation");
+        int totalScore = CalculateTotalScore();
+
+        if (totalScore > 60)
+        {
+            // 顯示彈跳視窗
+            bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "由於分數高於60，不適合進行化療，故無法預約。確認返回首頁？");
+
+            if (confirmed)
+            {
+                Navigation.NavigateTo("/userLogin");
+            }
+        }
+        else
+        {
+            // 導航至頁面
+            Navigation.NavigateTo("/reservation");
+        }
     }
+
+
 }

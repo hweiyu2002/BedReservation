@@ -1,6 +1,83 @@
 ﻿@page "/reservation"
-<h3>Reservation</h3>
+@inject IJSRuntime JSRuntime
+@using System.Text
+
+<h3 style=" color: #000000; background-color: 	#b0c4de; padding: 10px; text-align: center;">化療病床預約平台</h3>
+
+
+<h4 style=" text-align: center ;">Step 3：預約病床</h4>
+<br />
+
+<div class="form-group">
+    <label style="font-weight: bold;">選擇日期：</label>
+    <input type="date" @bind="SelectedDate" min="2023-11-01" />
+    <!-- 選擇日期輸入框，綁定選定的日期到SelectedDate變數，最小可選日期為 2023-11-01 -->
+</div>
+<br />
+
+<div class="form-group">
+    <label style="font-weight: bold;">選擇時段：</label><br />
+    <div style="display: flex; flex-wrap: wrap;">
+        @for (int i = 0; i < 16; i += 2)
+        {
+            int firstHour = 9 + i / 2;    // 起始小時
+            int secondHour = firstHour + 1;    // 結束小時
+
+            <div style="margin-bottom: 10px; width: 50%;">
+                <label>
+                    <input type="checkbox" checked="@SelectedTimeSlots[i]" @onchange="() => ToggleTimeSlot(i)" />
+                    @($"{firstHour:00}:00 ~ {firstHour:00}:30")
+                    <!-- 勾選時段的複選框，綁定到SelectedTimeSlots陣列中的對應索引，顯示時間範圍 -->
+                </label>
+            </div>
+            <div style="margin-bottom: 10px; width: 50%;">
+                <label>
+                    <input type="checkbox" checked="@SelectedTimeSlots[i + 1]" @onchange="() => ToggleTimeSlot(i + 1)" />
+                    @($"{firstHour:00}:30 ~ {secondHour:00}:00")
+                </label>
+            </div>
+        }
+    </div>
+</div>
+<br />
+
+<div class="form-group">
+    <label style="font-weight: bold;">選擇病床：</label>
+    <select @bind="SelectedBed">
+        <option value="A">病床 A</option>
+        <option value="B">病床 B</option>
+        <option value="C">病床 C</option>
+        <!-- 下拉式選單，綁定選擇的病床到SelectedBed變數 -->
+    </select>
+</div>
+<br />
+
+<div style="text-align: center;">
+    <button @onclick="ShowConfirmationPopup" style="background-color: #4169e1; color: white; border: 1px solid black;">確認預約</button>
+    <!-- 按鈕觸發ShowConfirmationPopup函數 -->
+</div>
+
+<br /><br />
+
 
 @code {
+    private DateTime SelectedDate { get; set; }
+    private bool[] SelectedTimeSlots = new bool[16];
+    private string SelectedBed { get; set; } = "A"; // 添加一個初始值， "A"
 
+    private void ToggleTimeSlot(int index)
+    {
+        if (index >= 0 && index < SelectedTimeSlots.Length)
+        {
+            SelectedTimeSlots[index] = !SelectedTimeSlots[index];
+            // 切換所選時段的勾選狀態
+        }
+    }
+
+    private async Task ShowConfirmationPopup()
+    {
+        // 通過JavaScript運行時顯示預約成功的警示訊息
+        await JSRuntime.InvokeVoidAsync("alert", "預約成功！");
+
+    }
 }

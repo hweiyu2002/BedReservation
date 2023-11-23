@@ -1,0 +1,188 @@
+﻿@page "/form"
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
+<h3 style="color: #000000; background-color: 	#acc7d0; padding: 10px; text-align: center;">化療病床預約平台</h3>
+<h4 style=" text-align: center ;">入院前評估表單</h4>
+<p style=" text-align: center ;">請您根據最近一週的狀況填寫表單</p>
+
+<div class="table-container" style=" width: 100%;max-width: 900px; margin: auto;">
+    <table class="table">
+        <tbody>
+            <tr>
+                <td style="width: 50%;">病歷號：</td>
+                <td ><input type="text" @bind="ChartNo" /></td>
+            </tr>
+            <tr>
+                <td>評估日期：</td>
+                <td><input type="date" @bind="Date"  /></td>
+            </tr>
+            <tr>
+                <td>身高(cm)：</td>
+                <td><input type="text" @bind="Height" /> cm</td>
+            </tr>
+            <tr>
+                <td>體重(kg)：</td>
+                <td><input type="text" @bind="Weight" /> kg</td>
+            </tr>
+            <tr>
+                <td>意識：</td>
+                <td>
+                    <input type="radio" id="clear" name="consciousness" @bind="Conscious" />
+                    <label for="clear">清醒</label>
+                    <input type="radio" id="drowsy" name="consciousness" @bind="Conscious" />
+                    <label for="drowsy">嗜睡</label>
+                    <input type="radio" id="unconscious" name="consciousness" @bind="Conscious" />
+                    <label for="unconscious">昏迷</label>
+                </td>
+            </tr>
+            <tr>
+                <td>血壓：</td>
+                <td><input type="text" @bind="BP" /> mmHg</td>
+            </tr>
+            <tr>
+                <td>心率：</td>
+                <td><input type="text" @bind="HR" /> 次/分</td>
+            </tr>
+            <tr>
+                <td>呼吸速率：</td>
+                <td><input type="text" @bind="RR" /> 次/分</td>
+            </tr>
+            <tr>
+                <td>體溫：</td>
+                <td><input type="text" @bind="BT" /> ℃</td>
+            </tr>
+            <tr>
+                <td>目前身體狀況：</td>
+                <td>
+                    <input type="radio" id="good" name="healthStatus"  @bind="Health" />
+                    <label for="good">良好</label>
+                    <input type="radio" id="normal" name="healthStatus" @bind="Health" />
+                   <label for="normal">一般</label>
+                   <input type="radio" id="fatigue" name="healthStatus"  @bind="Health" />
+                    <label for="unwell">不適</label>
+                </td>
+            </tr>
+            <tr>
+                <td>出國狀況：</td>
+                <td>
+                    <select @bind="Abroad">
+                        <option value="近期未出國">近期未出國</option>
+                        <option value="近期有出國">近期有出國</option>
+                        <option value="長期在國外居住">長期在國外居住</option>
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+    <td>職業：</td>
+    <td>
+        <input type="radio" id="professional" name="occupation"  @bind="Occupation" />
+        <label for="professional">專業人員（醫生、護士、工程師等）    </label>
+        <input type="radio" id="farmer" name="occupation"  @bind="Occupation" />
+        <label for="farmer">農民</label><br>
+        <input type="radio" id="worker" name="occupation"  @bind="Occupation" />
+        <label for="worker">工人      </label>
+        <input type="radio" id="administrator" name="occupation"  @bind="Occupation" />
+        <label for="administrator">行政人員      </label>
+        <input type="radio" id="student" name="occupation"  @bind="Occupation" />
+         <label for="student">學生      </label>
+        <input type="radio" id="freelancer" name="occupation"  @bind="Occupation" />
+         <label for="freelancer">自由職業者</label><br>
+        <input type="radio" id="otherOccupation" name="occupation" value="其他" @onchange="ToggleOtherOccupation" />
+                    <label for="otherOccupation">其他&nbsp; </label>
+
+        <!-- 如果選擇 "其他"，提供一個自由文本框 -->
+        @if (ShowOtherOccupation)
+        {
+            <input type="text" @bind="OtherOccupation" placeholder="請輸入您的職業" />
+        }
+    </td>
+</tr>
+            <tr>
+                <td>過敏史：</td>
+                <td><input @bind="AllergyHistory"/></td>
+            </tr>
+            <tr>
+                <td>疾病史：</td>
+                <td><input @bind="MedicalHistory"  /></td>
+            </tr>
+            <tr>
+                <td>操作人員：</td>
+                <td><input @bind="Operator"  /></td>
+            </tr>
+            <tr>
+                <td>操作時間：</td>
+                <td><input @bind="OperatingTime"  /></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div style="display: flex; justify-content: center;">
+    <button @onclick="SubmitForm" style="background-color: #E0E0E0; color: #272727; border: 1px solid black; margin-right: 10px;">確認</button>
+    <button @onclick="NavigateToHome" style="background-color: #E0E0E0; color: #272727; border: 1px solid black;">回首頁</button>
+</div>
+
+<br /><br />
+
+
+@code {
+    private string ChartNo { get; set; } = "";
+    private DateTime Date { get; set; } = DateTime.Now.Date;
+    private string Height { get; set; } = "";
+    private string Weight { get; set; } = "";
+    private string Conscious { get; set; } = "";
+    private string BP { get; set; }= "";
+    private string HR { get; set; } = "";
+    private string RR { get; set; } = "";
+    private string BT { get; set; } = "";
+    private string Health { get; set; } = "";
+    private string Abroad { get; set; } = "近期未出國";
+    private string Occupation { get; set; } = "";
+    private string AllergyHistory { get; set; } = "";
+    private string MedicalHistory { get; set; } = "";
+    private string Operator { get; set; } = "";
+    private string OperatingTime { get; set; } = "";
+
+
+    private bool ShowOtherOccupation { get; set; } 
+    private string OtherOccupation { get; set; } = "";
+
+    private void ToggleOtherOccupation(ChangeEventArgs e)
+    {
+        ShowOtherOccupation = e.Value?.ToString() == "其他";
+        if (!ShowOtherOccupation)
+        {
+            OtherOccupation = string.Empty;
+        }
+    }
+
+    private void SubmitForm()
+    {
+        // 在此處處理表單提交邏輯
+        // 你可以使用 MedicalRecordNumber、AssessmentDate、Height 等屬性的值
+        Navigation.NavigateTo("/Reservation");
+    }
+
+    private void NavigateToHome()
+    {
+        Navigation.NavigateTo("/UserLogin");
+    }
+}
+
+
+    <style >
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        color: black;
+    }
+
+    th, td {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+</style>
+
