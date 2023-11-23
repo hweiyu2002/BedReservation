@@ -1,43 +1,57 @@
 ﻿@page "/userLogin"
 @inject NavigationManager Navigation
 
-<h3 style="color: #000000; background-color: #b0c4de; padding: 10px; text-align: center; display: block; width: 100%;">化療病床預約平台</h3>
-
-<h4 style="text-align: center;">Step 1：登入資料</h4>
+<h3 style="color: #000000; background-color: #acc7d0; padding: 10px; text-align: center; display: block; width: 100%;">化療病床預約平台</h3>
+<br >
+<h4 style="text-align: center;">登入資料</h4>
 <br />
 
 <div style="display: flex; flex-direction: column; align-items: center;">
     <div class="form-group">
         <label>身分證字號</label>
         <input @bind="IdNumber" />
+        @if (!IsValidIdFormat(IdNumber) && ShowIdError)
+        {
+            <p style="color: red;  font-size:13px;">※身分證格式不正確，請重新輸入</p>
+        }
     </div>
     <br />
 
     <div class="form-group">
-        <label>姓名</label>
-        <input @bind="FullName" />
+        <label>密     碼</label>
+        <input type="password" @bind="Password" />
     </div>
     <br />
 
-    <div class="form-group">
-        <label>聯絡電話</label>
-        <input @bind="ContactNumber" />
-    </div>
-    <br />
-
-    <button @onclick="NextStep" style="background-color: #4169e1; color: white; border: 1px solid black;">下一步</button>
+    <button @onclick="NextStep" style="background-color: #E0E0E0; color: #272727; border: 1px solid black; margin-right: 10px;">登入</button>
 
 </div>
 
 @code {
     private string IdNumber { get; set; } = string.Empty;
-    private string FullName { get; set; } = string.Empty;
-    private string ContactNumber { get; set; } = string.Empty;
+    private string Password { get; set; } = string.Empty;
+    private bool ShowIdError { get; set; } = false;
 
+    private bool IsValidIdFormat(string idNumber)
+    {
+        // 身分證格式檢查，第一個字母大寫 + 9 位數字
+        return System.Text.RegularExpressions.Regex.IsMatch(idNumber, "^[A-Z]\\d{9}$");
+    }
 
     private void NextStep()
     {
+        // 檢查身分證格式
+        if (!IsValidIdFormat(IdNumber))
+        {
+            // 如果格式不正確，顯示錯誤信息
+            ShowIdError = true;
+            return;
+        }
+
+        // 重置錯誤顯示
+        ShowIdError = false;
+
         // 導航至 Scale 頁面
-        Navigation.NavigateTo("/scale");
+        Navigation.NavigateTo("/form");
     }
 }
