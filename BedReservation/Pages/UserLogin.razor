@@ -1,5 +1,7 @@
 ﻿@page "/userLogin"
 @inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
 
 <h3 style="color: #000000; background-color: #acc7d0; padding: 10px; text-align: center; display: block; width: 100%;">化療病床預約平台</h3>
 <br >
@@ -55,3 +57,87 @@
         Navigation.NavigateTo("/form");
     }
 }
+
+
+
+
+<span style="font-size:20px;cursor:pointer" @onclick="OpenNav">&#9776; 選單</span>
+
+<div class="sidebar" id="mySidebar">
+    <a href="javascript:void(0)" class="closebtn" @onclick="CloseNav">&#9665; 關閉選單</a>
+    <a href="/">首頁</a>
+    <a href="/reservation">預約化療時段</a>
+    <a href="/form">評估表單</a>
+    <a href="/myAppointments">我的預約</a>
+    <div class="logout-link">
+        <a href="/">登出</a>
+    </div>
+</div>
+
+<div style="margin-left:80px;">
+    <!-- Adjust the margin to account for the sidebar width -->
+    <!-- Your existing login form code here -->
+</div>
+
+@code {
+    private void OpenNav()
+    {
+        JSRuntime.InvokeVoidAsync("openNav");
+    }
+
+    private void CloseNav()
+    {
+        JSRuntime.InvokeVoidAsync("closeNav");
+    }
+}
+
+
+<style>
+    .sidebar {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        background-color: #B3B3B3;
+        overflow-x: hidden;
+        transition: 0.5s;
+        padding-top: 60px;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .sidebar a {
+            padding: 8px 8px 8px 32px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #000000;
+            transition: 0.3s;
+        }
+
+            .sidebar a:hover {
+                color: #f1f1f1;
+            }
+
+        .sidebar .closebtn {
+            position: absolute;
+            top: 0;
+            left: 25px;
+            font-size: 20px;
+            margin-left: 20px;
+        }
+    .logout-link {
+        margin-top: auto;
+    }
+</style>
+
+<script>
+    function openNav() {
+        document.getElementById("mySidebar").style.width = "250px";
+    }
+
+    function closeNav() {
+        document.getElementById("mySidebar").style.width = "0";
+    }
+</script>
