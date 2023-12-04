@@ -1,11 +1,15 @@
 ﻿@page "/userLogin"
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
+@inherits LayoutComponentBase
 
 
 <h3 style="color: #000000; background-color: #acc7d0; padding: 10px; text-align: center; display: block; width: 100%;">化療病床預約平台</h3>
 <br >
 <h4 style="text-align: center;">登入資料</h4>
+<br />
+<br />
+<br />
 <br />
 
 <div style="display: flex; flex-direction: column; align-items: center;">
@@ -20,7 +24,7 @@
     <br />
 
     <div class="form-group">
-        <label>密     碼</label>
+        <label>密&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;碼</label>
         <input type="password" @bind="Password" />
     </div>
     <br />
@@ -53,14 +57,14 @@
         // 重置錯誤顯示
         ShowIdError = false;
 
-        // 導航至 Scale 頁面
-        Navigation.NavigateTo("/form");
+        SharedData.IdNumber = IdNumber; // 將使用者輸入的身分證字號設定到 SharedData
+        Navigation.NavigateTo("/home");
     }
 }
 
 
 
-
+<!--
 <span style="font-size:20px;cursor:pointer" @onclick="OpenNav">&#9776; 選單</span>
 
 <div class="sidebar" id="mySidebar">
@@ -73,26 +77,16 @@
         <a href="/">登出</a>
     </div>
 </div>
+-->
 
 <div style="margin-left:80px;">
     <!-- Adjust the margin to account for the sidebar width -->
     <!-- Your existing login form code here -->
 </div>
 
-@code {
-    private void OpenNav()
-    {
-        JSRuntime.InvokeVoidAsync("openNav");
-    }
-
-    private void CloseNav()
-    {
-        JSRuntime.InvokeVoidAsync("closeNav");
-    }
-}
 
 
-<style>
+<style>/*
     .sidebar {
         height: 100%;
         width: 0;
@@ -120,18 +114,30 @@
                 color: #f1f1f1;
             }
 
+            .sidebar a:not(:last-child)::after {
+                content: "";
+                display: block;
+                height: 1px;
+                background-color: #000000;
+                margin-top: 8px; 
+                margin-bottom: 8px; 
+            }
+
         .sidebar .closebtn {
             position: absolute;
             top: 0;
-            left: 25px;
+            left: 0px;
             font-size: 20px;
-            margin-left: 20px;
+            margin-left: 0px;
         }
     .logout-link {
         margin-top: auto;
+        margin-left: 50px;
+        margin-bottom: 10px;
     }
-</style>
+   */</style>
 
+   <!--
 <script>
     function openNav() {
         document.getElementById("mySidebar").style.width = "250px";
@@ -141,3 +147,4 @@
         document.getElementById("mySidebar").style.width = "0";
     }
 </script>
+-->

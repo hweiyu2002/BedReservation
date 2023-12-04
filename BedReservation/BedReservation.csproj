@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <Content Remove="Pages\Menu.razor" />
+    <Content Remove="Shared\NoMenuLayout.razor" />
   </ItemGroup>
 
   <ItemGroup>
